@@ -1,5 +1,21 @@
 // Generate the HTML template
 function generateHTML(data) {
+    // Function to convert hex to rgb
+    function hexToRgb(hex) {
+        if (!hex) return null;
+        
+        // Remove the hash if it exists
+        hex = hex.replace('#', '');
+        
+        // Parse the hex values
+        let r = parseInt(hex.substring(0, 2), 16);
+        let g = parseInt(hex.substring(2, 4), 16);
+        let b = parseInt(hex.substring(4, 6), 16);
+        
+        // Return as comma-separated string for CSS variables
+        return `${r}, ${g}, ${b}`;
+    }
+
     // Generate services HTML
     let servicesHTML = '';
     data.services.forEach(service => {
@@ -16,6 +32,14 @@ function generateHTML(data) {
     
     // Logo scale (default to 70% if not provided)
     const logoScale = data.logoScale || '70';
+    
+    // Page background color (default to white if not provided)
+    const pageBgColor = data.pageBgColor || '#ffffff';
+    
+    // Section gradient settings (with defaults)
+    const sectionGradientStart = data.sectionGradientStart || '#0a0a19';
+    const sectionGradientEnd = data.sectionGradientEnd || '#1a1a2e';
+    const gradientAngle = data.gradientAngle || '135';
     
     // Escape any special characters in text fields
     const escapedLawFirmName = data.lawFirmName.replace(/'/g, "\\'");
@@ -38,7 +62,15 @@ function generateHTML(data) {
             --accent: ${data.accentColor};
             --dark: ${data.backgroundColor};
             --light: ${data.textColor};
+            --page-bg: ${pageBgColor};
             --glass: rgba(255, 255, 255, 0.1);
+            --page-bg-rgb: ${hexToRgb(pageBgColor) || '255, 255, 255'};
+            /* Extract RGB components from hex color for use in rgba() */
+            --primary-rgb: ${hexToRgb(data.primaryColor) || '139, 0, 0'};
+            --secondary-rgb: ${hexToRgb(data.secondaryColor) || '75, 54, 33'};
+            --accent-rgb: ${hexToRgb(data.accentColor) || '212, 175, 55'};
+            /* Section gradient */
+            --section-gradient: linear-gradient(${gradientAngle}deg, ${sectionGradientStart}, ${sectionGradientEnd});
         }
 
         * {
@@ -57,6 +89,42 @@ function generateHTML(data) {
             overflow-x: hidden;
             background: linear-gradient(to bottom right, #0f0c29, #302b63, #24243e);
             background-attachment: fixed;
+        }
+
+        /* Content containers with page background color */
+        .page-bg-container {
+            background-color: var(--page-bg);
+            margin: 20px;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Hero specific styling for page-bg-container */
+        #hero .page-bg-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            margin-top: 20px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        /* Add a subtle pattern overlay */
+        .page-bg-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: radial-gradient(var(--primary) 1px, transparent 1px);
+            background-size: 20px 20px;
+            opacity: 0.05;
+            pointer-events: none;
         }
 
         .particle {
@@ -126,10 +194,8 @@ function generateHTML(data) {
         }
 
         #hero {
-            display: flex;
             min-height: 100vh;
             padding: 150px 5% 100px;
-            align-items: center;
             position: relative;
             overflow: hidden;
         }
@@ -140,26 +206,47 @@ function generateHTML(data) {
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(to bottom right, rgba(15, 12, 41, 0.9), rgba(48, 43, 99, 0.9), rgba(36, 36, 62, 0.9));
+            background: var(--section-gradient);
+            z-index: -1;
+            overflow: hidden;
+        }
+        
+        /* Add a subtle radial gradient overlay */
+        .hero-background::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(
+                circle at center,
+                transparent 30%,
+                rgba(var(--primary-rgb), 0.05) 70%,
+                rgba(var(--secondary-rgb), 0.1) 100%
+            );
+            z-index: -1;
+        }
+        
+        /* Add subtle dot pattern */
+        .hero-background::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: radial-gradient(var(--primary) 1px, transparent 1px);
+            background-size: 30px 30px;
+            opacity: 0.05;
+            pointer-events: none;
             z-index: -1;
         }
 
         .hero-content {
             max-width: 600px;
-            margin-right: auto;
-            z-index: 2;
+            padding-right: 20px;
             animation: fadeInLeft 1s ease-out;
-        }
-
-        @keyframes fadeInLeft {
-            from {
-                opacity: 0;
-                transform: translateX(-50px);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
         }
 
         .hero-content h2 {
@@ -171,13 +258,15 @@ function generateHTML(data) {
             background-clip: text;
             -webkit-text-fill-color: transparent;
             line-height: 1.2;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
         .hero-content p {
             font-size: 1.2em;
             line-height: 1.6;
             margin-bottom: 30px;
-            color: rgba(255, 255, 255, 0.9);
+            color: var(--dark);
+            text-shadow: 0 1px 2px rgba(255, 255, 255, 0.2);
         }
 
         .hero-image-container {
@@ -199,12 +288,23 @@ function generateHTML(data) {
             to { opacity: 1; }
         }
 
+        @keyframes fadeInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
         .circle-container {
             position: absolute;
             width: 100%;
             height: 100%;
             border-radius: 50%;
-            background: white;
+            background: var(--page-bg);
             display: flex;
             justify-content: center;
             align-items: center;
@@ -215,16 +315,15 @@ function generateHTML(data) {
         }
 
         .circle-image {
-            width: ${logoScale}%;
+            width: ${logoScale}% !important;
             height: auto;
             object-fit: contain;
-            transform: scale(1);
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            max-width: none;
-            max-height: none;
+            max-width: none !important;
+            max-height: none !important;
         }
 
         .circle-overlay {
@@ -259,7 +358,7 @@ function generateHTML(data) {
 
         .futuristic-button {
             background-color: transparent;
-            color: #fff;
+            color: var(--dark);
             padding: 15px 30px;
             text-decoration: none;
             border-radius: 50px;
@@ -274,7 +373,7 @@ function generateHTML(data) {
             overflow: hidden;
             z-index: 1;
             cursor: pointer;
-            box-shadow: 0 0 15px rgba(0, 188, 212, 0.3);
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
         }
 
         .futuristic-button::before {
@@ -295,7 +394,8 @@ function generateHTML(data) {
 
         .futuristic-button:hover {
             transform: translateY(-3px);
-            box-shadow: 0 0 25px rgba(0, 188, 212, 0.6);
+            box-shadow: 0 0 25px rgba(0, 0, 0, 0.3);
+            color: var(--light);
         }
 
         .futuristic-button i {
@@ -310,14 +410,16 @@ function generateHTML(data) {
             padding: 100px 5%;
             text-align: center;
             position: relative;
+            background: var(--section-gradient);
         }
 
         .section-title {
             font-size: 2.5em;
             margin-bottom: 50px;
-            color: var(--light);
+            color: var(--page-bg);
             position: relative;
             display: inline-block;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
         }
 
         .section-title::after {
@@ -343,13 +445,14 @@ function generateHTML(data) {
             width: 300px;
             padding: 30px;
             border-radius: 15px;
-            background: rgba(255, 255, 255, 0.05);
+            background: rgba(var(--page-bg-rgb), 0.9);
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.1);
             cursor: pointer;
             overflow: hidden;
             transition: transform 0.3s, box-shadow 0.3s;
+            color: var(--dark);
         }
 
         .feature::before {
@@ -385,11 +488,11 @@ function generateHTML(data) {
         .feature h3 {
             font-size: 1.5em;
             margin-bottom: 15px;
-            color: var(--light);
+            color: var(--dark);
         }
 
         .feature p {
-            color: rgba(255, 255, 255, 0.7);
+            color: rgba(0, 0, 0, 0.7);
             line-height: 1.6;
         }
 
@@ -397,19 +500,16 @@ function generateHTML(data) {
             padding: 100px 5%;
             text-align: center;
             position: relative;
-            background: linear-gradient(rgba(10, 10, 25, 0.8), rgba(10, 10, 25, 0.9));
+            background: var(--section-gradient);
             background-attachment: fixed;
         }
 
         .contact-container {
             max-width: 800px;
             margin: 0 auto;
-            padding: 40px;
-            border-radius: 15px;
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 8px;
+            background: transparent;
         }
 
         .contact-info {
@@ -427,8 +527,12 @@ function generateHTML(data) {
             padding: 20px;
             width: 200px;
             border-radius: 10px;
-            background: rgba(255, 255, 255, 0.05);
+            background: rgba(var(--page-bg-rgb), 0.9);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
             transition: transform 0.3s, box-shadow 0.3s;
+            border: 1px solid rgba(var(--primary-rgb), 0.2);
+            color: var(--dark);
         }
 
         .contact-item:hover {
@@ -448,7 +552,7 @@ function generateHTML(data) {
         }
 
         .contact-item a {
-            color: var(--light);
+            color: var(--dark);
             text-decoration: none;
             font-size: 1.1em;
             transition: color 0.3s;
@@ -483,6 +587,7 @@ function generateHTML(data) {
             background: linear-gradient(to right, transparent, var(--primary), transparent);
         }
 
+        /* Make sure images are visible on all browsers/devices */
         @media (max-width: 768px) {
             .navbar {
                 padding: 10px 15px;
@@ -502,15 +607,25 @@ function generateHTML(data) {
             }
 
             #hero {
+                padding: 170px 10px 50px;
+            }
+
+            #hero .page-bg-container {
                 flex-direction: column;
-                text-align: center;
-                padding: 170px 20px 50px;
+                margin: 10px;
+                padding: 20px;
+            }
+
+            .page-bg-container {
+                margin: 10px;
+                padding: 20px;
             }
 
             .hero-content {
                 max-width: 100%;
                 margin-right: 0;
                 margin-bottom: 50px;
+                padding-right: 0;
             }
 
             .hero-content h2 {
@@ -524,27 +639,19 @@ function generateHTML(data) {
             }
             
             .circle-image {
-                width: ${logoScale}%;
-                height: auto;
-                object-fit: contain;
-                position: absolute;
-                top: 50%;
-                left: 50%;
-                transform: translate(-50%, -50%);
-                max-width: none;
-                max-height: none;
-                background-color: transparent;
+                width: ${logoScale}% !important;
+                max-width: none !important;
+                max-height: none !important;
             }
             
             .circle-container {
-                background-color: white;
-                width: 100%;
-                height: 100%;
+                position: relative;
+                background: var(--page-bg);
+                border-radius: 50%;
+                overflow: hidden;
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                padding: 0;
-                position: relative;
             }
 
             .features-container {
@@ -572,6 +679,15 @@ function generateHTML(data) {
             }
         }
     </style>
+    
+    <!-- Highest priority styles to ensure logo scaling works in all views including inspector -->
+    <style id="critical-logo-styles">
+        .circle-image {
+            width: ${logoScale}% !important;
+            max-width: none !important;
+            max-height: none !important;
+        }
+    </style>
 </head>
 <body>
     <!-- Animated particles in background -->
@@ -589,51 +705,61 @@ function generateHTML(data) {
 
     <section id="hero">
         <div class="hero-background"></div>
-        <div class="hero-content">
-            <h2>${escapedLawFirmName}</h2>
-            <p>${escapedTagline}</p>
-            <a href="#" id="downloadVCard" class="futuristic-button">
-                <i class="fas fa-address-card"></i> Ajouter aux Contacts
-            </a>
-        </div>
-        <div class="hero-image-container">
-            <div class="circle-container">
-                <img src="${logoSrc}" alt="${escapedLawFirmName}" class="circle-image" loading="eager" onerror="this.onerror=null;this.alt='${escapedLawFirmName.toUpperCase()}';">
-                <div class="circle-overlay"></div>
-                <div class="circle-pulse"></div>
+        <div class="page-bg-container">
+            <div class="hero-content">
+                <h2>${escapedLawFirmName}</h2>
+                <p>${escapedTagline}</p>
+                <a href="#" id="downloadVCard" class="futuristic-button">
+                    <i class="fas fa-address-card"></i> Ajouter aux Contacts
+                </a>
+            </div>
+            <div class="hero-image-container">
+                <div class="circle-container">
+                    <img src="${logoSrc}" 
+                        alt="${escapedLawFirmName}" 
+                        class="circle-image" 
+                        style="width: ${logoScale}%; max-width: none !important; max-height: none !important;"
+                        onerror="this.onerror=null;this.src='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';this.alt='${escapedLawFirmName.toUpperCase()}';">
+                    <div class="circle-overlay"></div>
+                    <div class="circle-pulse"></div>
+                </div>
             </div>
         </div>
     </section>
 
     <section id="features">
         <h2 class="section-title">${data.servicesTitle}</h2>
-        <div class="features-container">
-            ${servicesHTML}
+        <div class="page-bg-container">
+            <div class="features-container">
+                ${servicesHTML}
+            </div>
         </div>
     </section>
 
     <section id="contact">
         <h2 class="section-title">${data.contactTitle}</h2>
-        <div class="contact-container">
-            <p>${data.contactSubtitle}</p>
-            <div class="contact-info">
-                <div class="contact-item">
-                    <i class="fas fa-map-marker-alt"></i>
-                    <a href="https://www.google.com/maps" target="_blank">
-                        ${escapedContactAddress}
-                    </a>
-                </div>
-                <div class="contact-item">
-                    <i class="fas fa-phone-alt"></i>
-                    <a href="tel:${data.contactPhone}">${data.contactPhone}</a>
-                </div>
-                <div class="contact-item">
-                    <i class="fas fa-envelope"></i>
-                    <a href="mailto:${data.contactEmail}">${data.contactEmail}</a>
-                </div>
-                <div class="contact-item">
-                    <i class="fas fa-globe"></i>
-                    <a href="https://${data.contactWebsite}" target="_blank">${data.contactWebsite}</a>
+        <div class="page-bg-container">
+            <div class="contact-container">
+                <p>${data.contactSubtitle}</p>
+                <div class="contact-info">
+                    <div class="contact-item">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <a href="https://www.google.com/maps" target="_blank">
+                            ${escapedContactAddress}
+                        </a>
+                    </div>
+                    <div class="contact-item">
+                        <i class="fas fa-phone-alt"></i>
+                        <a href="tel:${data.contactPhone}">${data.contactPhone}</a>
+                    </div>
+                    <div class="contact-item">
+                        <i class="fas fa-envelope"></i>
+                        <a href="mailto:${data.contactEmail}">${data.contactEmail}</a>
+                    </div>
+                    <div class="contact-item">
+                        <i class="fas fa-globe"></i>
+                        <a href="https://${data.contactWebsite}" target="_blank">${data.contactWebsite}</a>
+                    </div>
                 </div>
             </div>
         </div>
@@ -644,6 +770,17 @@ function generateHTML(data) {
     </footer>
 
     <script>
+        // Immediate logo scaling as soon as script loads
+        (function initLogoScale() {
+            const scale = ${logoScale};
+            const logoImg = document.querySelector('.circle-image');
+            if (logoImg) {
+                logoImg.style.width = scale + '%';
+                logoImg.style.maxWidth = 'none';
+                logoImg.style.maxHeight = 'none';
+            }
+        })();
+        
         // Create animated background particles
         function createParticles() {
             const particlesContainer = document.getElementById('particles');
@@ -710,8 +847,29 @@ function generateHTML(data) {
             var firstName = nameParts.join(' ');
             var organization = "${escapedLawFirmName}";
             
-            // Create vCard data without template literals
-            var vCardData = "BEGIN:VCARD\\nVERSION:3.0\\nN:" + lastName + ";" + firstName + ";;;\\nFN:" + contactName + "\\nORG:" + organization + "\\nTEL;TYPE=WORK,VOICE:" + phoneNumber + "\\nADR;TYPE=WORK:;;" + address + ";;;\\nEMAIL;TYPE=WORK:" + email + "\\nURL:" + website + "\\nEND:VCARD";
+            // Get the logo for the contact photo
+            var logoSrc = "${logoSrc}"; // Use the logo directly from the template data
+            
+            // Create vCard data including the photo
+            var vCardData = "BEGIN:VCARD\\n" +
+                "VERSION:3.0\\n" +
+                "N:" + lastName + ";" + firstName + ";;;\\n" +
+                "FN:" + contactName + "\\n" +
+                "ORG:" + organization + "\\n" +
+                "TEL;TYPE=WORK,VOICE:" + phoneNumber + "\\n" +
+                "ADR;TYPE=WORK:;;" + address + ";;;\\n" +
+                "EMAIL;TYPE=WORK:" + email + "\\n" +
+                "URL:" + website + "\\n";
+            
+            // Add the photo if available (base64 format)
+            if (logoSrc && logoSrc.startsWith('data:image')) {
+                // Extract base64 data from the Data URL
+                var base64Data = logoSrc.split(',')[1];
+                // Add proper PHOTO property with BASE64 encoding
+                vCardData += "PHOTO;ENCODING=b;TYPE=JPEG:" + base64Data + "\\n";
+            }
+            
+            vCardData += "END:VCARD";
                 
             var blob = new Blob([vCardData], { type: 'text/vcard;charset=utf-8' });
             var url = URL.createObjectURL(blob);
@@ -724,12 +882,21 @@ function generateHTML(data) {
             document.body.removeChild(link);
 
             URL.revokeObjectURL(url);
+            
+            
         });
 
         // Initialize everything when the page loads
         window.addEventListener('load', () => {
             createParticles();
             animateOnScroll();
+            
+            // Make sure logo is properly displayed
+            ensureLogoDisplay();
+            
+            // Handle window resize for responsive behavior
+            handleResponsive();
+            window.addEventListener('resize', handleResponsive);
             
             // Smooth scroll for navigation links
             document.querySelectorAll('a[href^="#"]:not([href="#"])').forEach(anchor => {
@@ -746,6 +913,28 @@ function generateHTML(data) {
                 });
             });
         });
+        
+        // Ensure logo is properly displayed
+        function ensureLogoDisplay() {
+            const logoImg = document.querySelector('.circle-image');
+            if (logoImg) {
+                const scale = ${logoScale};
+                logoImg.style.width = scale + '%';
+                logoImg.style.maxWidth = 'none';
+                logoImg.style.maxHeight = 'none';
+            }
+        }
+        
+        // Handle responsive adjustments
+        function handleResponsive() {
+            const logoImg = document.querySelector('.circle-image');
+            if (logoImg) {
+                const scale = ${logoScale};
+                logoImg.style.width = scale + '%';
+                logoImg.style.maxWidth = 'none';
+                logoImg.style.maxHeight = 'none';
+            }
+        }
     </script>
 </body>
 </html>`;
