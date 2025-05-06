@@ -883,6 +883,8 @@ function generateHTML(data) {
 
             URL.revokeObjectURL(url);
             
+            // Use the non-intrusive notification system instead of an alert
+            showNotification('Contact card downloaded with logo included.');
             
         });
 
