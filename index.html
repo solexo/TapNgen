@@ -291,6 +291,60 @@
             min-width: 40px;
             text-align: right;
         }
+        
+        /* Mobile responsiveness */
+        @media (max-width: 768px) {
+            .editor-container {
+                flex-direction: column;
+                height: auto;
+            }
+            
+            .sidebar {
+                width: 100%;
+                order: 1;
+                max-height: none;
+                overflow-y: auto;
+                padding-bottom: 80px;
+            }
+            
+            .preview-container {
+                order: 2;
+                height: auto;
+                padding-bottom: 80px;
+            }
+            
+            .preview-frame {
+                height: 90vh;
+            }
+            
+            .action-buttons {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                background-color: var(--editor-panel);
+                padding: 15px;
+                margin-top: 0;
+                margin-bottom: 0;
+                z-index: 100;
+                box-shadow: 0 -5px 10px rgba(0, 0, 0, 0.2);
+            }
+            
+            .action-buttons .btn {
+                padding: 12px 15px;
+                font-size: 1rem;
+            }
+            
+            body {
+                overflow-y: auto;
+                height: auto;
+            }
+            
+            .accordion-content {
+                max-height: none;
+                overflow: visible;
+            }
+        }
     </style>
 </head>
 <body>
