@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TapNgen</title>
+    <title>Law Firm Template Editor</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root {
@@ -292,6 +292,27 @@
             text-align: right;
         }
         
+        .gradient-preview {
+            margin-top: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        #section-gradient-preview {
+            width: 100%;
+            height: 40px;
+            border-radius: 4px;
+            border: 1px solid #555;
+            background: linear-gradient(135deg, #0a0a19, #1a1a2e);
+        }
+        
+        .gradient-preview-label {
+            font-size: 0.8rem;
+            opacity: 0.8;
+        }
+        
         /* Mobile responsiveness */
         @media (max-width: 768px) {
             .editor-container {
@@ -311,10 +332,15 @@
                 order: 2;
                 height: auto;
                 padding-bottom: 80px;
+                width: 100%;
             }
             
             .preview-frame {
-                height: 90vh;
+                height: 80vh;
+                min-height: 600px;
+                border: none;
+                box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+                border-radius: 8px;
             }
             
             .action-buttons {
@@ -350,7 +376,7 @@
 <body>
     <div class="editor-container">
         <div class="sidebar">
-            <div class="editor-title">TapNgen</div>
+            <div class="editor-title">TapNgen Template Editor</div>
             
             <!-- General Settings -->
             <div class="accordion active">
@@ -360,7 +386,7 @@
                 </div>
                 <div class="accordion-content">
                     <div class="form-group">
-                        <label for="law-firm-name">TapNgen</label>
+                        <label for="law-firm-name">Law Firm Name</label>
                         <input type="text" id="law-firm-name" value="Cabinet d'avocats BOUYAQINE">
                     </div>
                     <div class="form-group">
@@ -414,10 +440,34 @@
                         <label for="text-color">Text Color</label>
                         <input type="color" id="text-color" value="#f0f8ff">
                     </div>
+                    <div class="form-group">
+                        <label for="page-bg-color">Page Background Color</label>
+                        <input type="color" id="page-bg-color" value="#ffffff">
+                    </div>
+                    <div class="form-group">
+                        <label for="section-gradient-start">Section Gradient Start</label>
+                        <input type="color" id="section-gradient-start" value="#0a0a19">
+                    </div>
+                    <div class="form-group">
+                        <label for="section-gradient-end">Section Gradient End</label>
+                        <input type="color" id="section-gradient-end" value="#1a1a2e">
+                    </div>
+                    <div class="form-group">
+                        <label for="gradient-angle">Gradient Angle (degrees)</label>
+                        <div class="slider-container">
+                            <input type="range" id="gradient-angle" min="0" max="360" value="135" class="slider">
+                            <span id="gradient-angle-value">135°</span>
+                        </div>
+                    </div>
                     <div class="color-preview">
                         <div class="color-swatch" id="primary-swatch"></div>
                         <div class="color-swatch" id="secondary-swatch"></div>
                         <div class="color-swatch" id="accent-swatch"></div>
+                        <div class="color-swatch" id="page-bg-swatch"></div>
+                    </div>
+                    <div class="gradient-preview">
+                        <div id="section-gradient-preview"></div>
+                        <span class="gradient-preview-label">Section Gradient</span>
                     </div>
                 </div>
             </div>
@@ -575,14 +625,24 @@
         const accentColor = document.getElementById('accent-color');
         const backgroundColor = document.getElementById('background-color');
         const textColor = document.getElementById('text-color');
+        const pageBgColor = document.getElementById('page-bg-color');
+        const sectionGradientStart = document.getElementById('section-gradient-start');
+        const sectionGradientEnd = document.getElementById('section-gradient-end');
+        const gradientAngle = document.getElementById('gradient-angle');
+        const gradientAngleValue = document.getElementById('gradient-angle-value');
         
         // Color swatches
         const primarySwatch = document.getElementById('primary-swatch');
         const secondarySwatch = document.getElementById('secondary-swatch');
         const accentSwatch = document.getElementById('accent-swatch');
+        const pageBgSwatch = document.getElementById('page-bg-swatch');
+        const sectionGradientPreview = document.getElementById('section-gradient-preview');
         
         // Initialize color swatches
         updateColorSwatches();
+        
+        // Initialize gradient preview
+        updateGradientPreview();
         
         // Initialize service items
         initializeServices();
@@ -653,6 +713,14 @@
             primaryColor.addEventListener('input', updateColorSwatches);
             secondaryColor.addEventListener('input', updateColorSwatches);
             accentColor.addEventListener('input', updateColorSwatches);
+            backgroundColor.addEventListener('input', updateColorSwatches);
+            textColor.addEventListener('input', updateColorSwatches);
+            pageBgColor.addEventListener('input', updateColorSwatches);
+            
+            // Gradient inputs
+            sectionGradientStart.addEventListener('input', updateGradientPreview);
+            sectionGradientEnd.addEventListener('input', updateGradientPreview);
+            gradientAngle.addEventListener('input', updateGradientPreview);
         }
         
         // Update color swatches
@@ -660,6 +728,14 @@
             primarySwatch.style.backgroundColor = primaryColor.value;
             secondarySwatch.style.backgroundColor = secondaryColor.value;
             accentSwatch.style.backgroundColor = accentColor.value;
+            pageBgSwatch.style.backgroundColor = pageBgColor.value;
+        }
+        
+        // Update gradient preview
+        function updateGradientPreview() {
+            const angle = gradientAngle.value;
+            gradientAngleValue.textContent = `${angle}°`;
+            sectionGradientPreview.style.background = `linear-gradient(${angle}deg, ${sectionGradientStart.value}, ${sectionGradientEnd.value})`;
         }
         
         // Add a new service
@@ -731,6 +807,10 @@
             const accentColorValue = accentColor.value;
             const backgroundColorValue = backgroundColor.value;
             const textColorValue = textColor.value;
+            const pageBgColorValue = pageBgColor.value;
+            const sectionGradientStartValue = sectionGradientStart.value;
+            const sectionGradientEndValue = sectionGradientEnd.value;
+            const gradientAngleValue = gradientAngle.value;
             const servicesTitle = document.getElementById('services-title').value;
             const contactTitle = document.getElementById('contact-title').value;
             const contactSubtitle = document.getElementById('contact-subtitle').value;
@@ -754,6 +834,10 @@
                 accentColor: accentColorValue,
                 backgroundColor: backgroundColorValue,
                 textColor: textColorValue,
+                pageBgColor: pageBgColorValue,
+                sectionGradientStart: sectionGradientStartValue,
+                sectionGradientEnd: sectionGradientEndValue,
+                gradientAngle: gradientAngleValue,
                 servicesTitle,
                 contactTitle,
                 contactSubtitle,
@@ -806,6 +890,10 @@
             const accentColorValue = accentColor.value;
             const backgroundColorValue = backgroundColor.value;
             const textColorValue = textColor.value;
+            const pageBgColorValue = pageBgColor.value;
+            const sectionGradientStartValue = sectionGradientStart.value;
+            const sectionGradientEndValue = sectionGradientEnd.value;
+            const gradientAngleValue = gradientAngle.value;
             const servicesTitle = document.getElementById('services-title').value;
             const contactTitle = document.getElementById('contact-title').value;
             const contactSubtitle = document.getElementById('contact-subtitle').value;
@@ -826,6 +914,10 @@
                 accentColor: accentColorValue,
                 backgroundColor: backgroundColorValue,
                 textColor: textColorValue,
+                pageBgColor: pageBgColorValue,
+                sectionGradientStart: sectionGradientStartValue,
+                sectionGradientEnd: sectionGradientEndValue,
+                gradientAngle: gradientAngleValue,
                 servicesTitle,
                 contactTitle,
                 contactSubtitle,
