@@ -711,7 +711,7 @@ function generateHTML(data) {
             var organization = "${escapedLawFirmName}";
             
             // Create vCard data without template literals
-            var vCardData = "BEGIN:VCARD\\nVERSION:3.0\\nN:" + lastName + ";" + firstName + ";;;\\nFN:" + contactName + "\\nORG:" + organization + "\\nTITLE:Avocat\\nTEL;TYPE=WORK,VOICE:" + phoneNumber + "\\nADR;TYPE=WORK:;;" + address + ";;;\\nEMAIL;TYPE=WORK:" + email + "\\nURL:" + website + "\\nEND:VCARD";
+            var vCardData = "BEGIN:VCARD\\nVERSION:3.0\\nN:" + lastName + ";" + firstName + ";;;\\nFN:" + contactName + "\\nORG:" + organization + "\\nTEL;TYPE=WORK,VOICE:" + phoneNumber + "\\nADR;TYPE=WORK:;;" + address + ";;;\\nEMAIL;TYPE=WORK:" + email + "\\nURL:" + website + "\\nEND:VCARD";
                 
             var blob = new Blob([vCardData], { type: 'text/vcard;charset=utf-8' });
             var url = URL.createObjectURL(blob);
