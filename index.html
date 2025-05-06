@@ -160,10 +160,15 @@
             gap: 10px;
             margin-top: 20px;
             justify-content: center;
+            flex-wrap: wrap;
         }
 
         .action-buttons .btn {
             flex: 1;
+            min-width: 0;
+            padding: 10px 8px;
+            font-size: 0.85rem;
+            white-space: nowrap;
         }
         
         .color-preview {
@@ -433,11 +438,11 @@
                         <input type="color" id="accent-color" value="#d4af37">
                     </div>
                     <div class="form-group">
-                        <label for="background-color">Background Color</label>
+                        <label for="background-color">Text Color</label>
                         <input type="color" id="background-color" value="#1a1a2e">
                     </div>
                     <div class="form-group">
-                        <label for="text-color">Text Color</label>
+                        <label for="text-color">Footer text Color</label>
                         <input type="color" id="text-color" value="#f0f8ff">
                     </div>
                     <div class="form-group">
@@ -547,6 +552,7 @@
             <div class="action-buttons">
                 <button class="btn" id="preview-btn">Update Preview</button>
                 <button class="btn btn-secondary" id="download-btn">Download HTML</button>
+                <button class="btn btn-secondary" id="download-txt-btn">Download as TXT</button>
             </div>
         </div>
         
@@ -611,6 +617,7 @@
         const previewFrame = document.getElementById('preview-frame');
         const previewBtn = document.getElementById('preview-btn');
         const downloadBtn = document.getElementById('download-btn');
+        const downloadTxtBtn = document.getElementById('download-txt-btn');
         const servicesContainer = document.getElementById('services-container');
         const addServiceBtn = document.getElementById('add-service-btn');
         const notification = document.getElementById('notification');
@@ -689,8 +696,9 @@
             // Preview button
             previewBtn.addEventListener('click', updatePreview);
             
-            // Download button
+            // Download buttons
             downloadBtn.addEventListener('click', downloadHTML);
+            downloadTxtBtn.addEventListener('click', downloadAsText);
             
             // Add service button
             addServiceBtn.addEventListener('click', addService);
@@ -707,7 +715,11 @@
             logoUpload.addEventListener('change', handleLogoUpload);
             
             // Logo scale slider
-            logoScale.addEventListener('input', updateLogoScale);
+            logoScale.addEventListener('input', function() {
+                updateLogoScale();
+                // Update preview immediately on every change
+                updatePreview();
+            });
             
             // Color inputs
             primaryColor.addEventListener('input', updateColorSwatches);
@@ -785,6 +797,17 @@
             logoScaleValue.textContent = `${scale}%`;
             logoPreview.style.maxWidth = `${scale}%`;
             logoPreview.style.maxHeight = `${scale}%`;
+            
+            // Update preview immediately if iframe is loaded
+            if (previewFrame.contentDocument) {
+                const logoImg = previewFrame.contentDocument.querySelector('.circle-image');
+                if (logoImg) {
+                    // Direct assignment is most reliable
+                    logoImg.style.width = `${scale}%`;
+                    logoImg.style.maxWidth = 'none';
+                    logoImg.style.maxHeight = 'none';
+                }
+            }
         }
         
         // Show notification
@@ -932,18 +955,102 @@
                 services
             });
             
+            // Create a friendly file name based on the law firm name
+            const fileName = lawFirmName.replace(/[^\w\s]/gi, '').replace(/\s+/g, '-').toLowerCase() + '.html';
+            
             // Create blob and download link
             const blob = new Blob([html], {type: 'text/html'});
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = 'law-firm-template.html';
+            a.download = fileName;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
             
-            showNotification('HTML file downloaded!');
+            // Show instructions about unblocking the file in Windows
+            showNotification('HTML file downloaded! If Windows shows a security warning, right-click the file, select Properties, and check "Unblock".');
+            // Keep notification visible longer for this important message
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 8000); // Extended to 8 seconds instead of the usual 3
+        }
+
+        // Download as plain text file (avoids Windows security restrictions)
+        function downloadAsText() {
+            // Update services data
+            updateServicesData();
+            
+            // Get all current values (same as in downloadHTML)
+            const lawFirmName = document.getElementById('law-firm-name').value;
+            const tagline = document.getElementById('tagline').value;
+            const primaryColorValue = primaryColor.value;
+            const secondaryColorValue = secondaryColor.value;
+            const accentColorValue = accentColor.value;
+            const backgroundColorValue = backgroundColor.value;
+            const textColorValue = textColor.value;
+            const pageBgColorValue = pageBgColor.value;
+            const sectionGradientStartValue = sectionGradientStart.value;
+            const sectionGradientEndValue = sectionGradientEnd.value;
+            const gradientAngleValue = gradientAngle.value;
+            const servicesTitle = document.getElementById('services-title').value;
+            const contactTitle = document.getElementById('contact-title').value;
+            const contactSubtitle = document.getElementById('contact-subtitle').value;
+            const contactName = document.getElementById('contact-name').value;
+            const contactAddress = document.getElementById('contact-address').value;
+            const contactPhone = document.getElementById('contact-phone').value;
+            const contactEmail = document.getElementById('contact-email').value;
+            const contactWebsite = document.getElementById('contact-website').value;
+            const footerText = document.getElementById('footer-text').value;
+            const logoScaleValue = logoScale.value;
+            
+            // Generate the HTML content
+            const html = generateHTML({
+                lawFirmName,
+                tagline,
+                primaryColor: primaryColorValue,
+                secondaryColor: secondaryColorValue,
+                accentColor: accentColorValue,
+                backgroundColor: backgroundColorValue,
+                textColor: textColorValue,
+                pageBgColor: pageBgColorValue,
+                sectionGradientStart: sectionGradientStartValue,
+                sectionGradientEnd: sectionGradientEndValue,
+                gradientAngle: gradientAngleValue,
+                servicesTitle,
+                contactTitle,
+                contactSubtitle,
+                contactName,
+                contactAddress,
+                contactPhone,
+                contactEmail,
+                contactWebsite,
+                footerText,
+                logoData,
+                logoScale: logoScaleValue,
+                services
+            });
+            
+            // Create a friendly file name
+            const fileName = lawFirmName.replace(/[^\w\s]/gi, '').replace(/\s+/g, '-').toLowerCase() + '.txt';
+            
+            // Create blob as text file and download
+            const blob = new Blob([html], {type: 'text/plain;charset=utf-8'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = fileName;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            showNotification('File downloaded as text file. To use it as HTML: 1) Rename to .html after downloading 2) Open with browser');
+            // Keep notification visible longer
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 8000);
         }
     </script>
     <script src="template-editor.js"></script>
