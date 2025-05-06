@@ -1,5 +1,5 @@
 // Generate the HTML template
-function generateHTML(data) {
+window.generateHTML = function(data) {
     // Function to convert hex to rgb
     function hexToRgb(hex) {
         if (!hex) return null;
@@ -27,8 +27,8 @@ function generateHTML(data) {
         </div>`;
     });
     
-    // Logo source
-    const logoSrc = data.logoData || './logo.png';
+    // Logo source - use a transparent pixel as the default if no logo provided
+    const logoSrc = data.logoData || 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
     
     // Logo scale (default to 70% if not provided)
     const logoScale = data.logoScale || '70';
