@@ -770,7 +770,7 @@ window.generateHTML = function(data) {
             <div class="hero-content">
                 <h2>${escapedLawFirmName}</h2>
                 <p>${escapedTagline}</p>
-                <a href="#" id="downloadVCard" class="futuristic-button">
+                <a href="#" id="downloadVCard" class="futuristic-button" onclick="window.parent.downloadVCardFromEditor && window.parent.downloadVCardFromEditor(); return false;">
                     <i class="fas fa-address-card"></i> Ajouter aux Contacts
                 </a>
             </div>
@@ -844,87 +844,41 @@ window.generateHTML = function(data) {
             }
         })();
         
-        // Create dedicated particles for each section
-        function createParticlesForSection(sectionId) {
-            const section = document.getElementById(sectionId);
-            if (!section) return;
-            
-            // Create/get the particles container
-            const containerId = sectionId + '-particles';
-            let particlesContainer = document.getElementById(containerId);
-            
-            if (!particlesContainer) {
-                particlesContainer = document.createElement('div');
-                particlesContainer.id = containerId;
-                particlesContainer.style.position = 'absolute';
-                particlesContainer.style.top = '0';
-                particlesContainer.style.left = '0';
-                particlesContainer.style.width = '100%';
-                particlesContainer.style.height = '100%';
-                particlesContainer.style.overflow = 'hidden';
-                particlesContainer.style.pointerEvents = 'none';
-                particlesContainer.style.zIndex = '0';
-                section.insertBefore(particlesContainer, section.firstChild);
-            }
-            
-            // Clear any existing particles
+        // Create a single set of particles for the whole page
+        function createParticles() {
+            var particlesContainer = document.getElementById('particles');
+            if (!particlesContainer) return;
             particlesContainer.innerHTML = '';
-            
-            // Get section-specific colors
-            let particleColor, shadowColor;
-            const rootStyle = getComputedStyle(document.documentElement);
-            
-            if (sectionId === 'hero') {
-                particleColor = rootStyle.getPropertyValue('--primary');
-                shadowColor = particleColor;
-                var numParticles = 20; // More particles for hero
-            } else if (sectionId === 'features') {
-                particleColor = rootStyle.getPropertyValue('--accent');
-                shadowColor = particleColor;
-                var numParticles = 15;
-            } else if (sectionId === 'contact') {
-                particleColor = rootStyle.getPropertyValue('--secondary');
-                shadowColor = particleColor;
-                var numParticles = 12;
-            } else {
-                particleColor = rootStyle.getPropertyValue('--primary');
-                shadowColor = particleColor;
-                var numParticles = 15;
-            }
-            
-            // Create particles
-            for (let i = 0; i < numParticles; i++) {
-                const particle = document.createElement('div');
+            // You can adjust the number and color of particles here
+            var numParticles = 40;
+            var rootStyle = getComputedStyle(document.documentElement);
+            var particleColor = rootStyle.getPropertyValue('--primary');
+            var shadowColor = particleColor;
+            for (var i = 0; i < numParticles; i++) {
+                var particle = document.createElement('div');
                 particle.classList.add('particle');
-                
                 // Random position
-                const posX = Math.random() * 100;
-                const posY = Math.random() * 100;
-                
-                // Random size - section specific
-                const size = Math.random() * 120 + 80;
-                
+                var posX = Math.random() * 100;
+                var posY = Math.random() * 100;
+                // Random size
+                var size = Math.random() * 120 + 80;
                 // Random animation delay
-                const delay = Math.random() * 8;
-                
-                // Apply styles directly to ensure they work
+                var delay = Math.random() * 8;
+                // Apply styles directly
                 particle.style.position = 'absolute';
-                particle.style.left = \`\${posX}%\`;
-                particle.style.top = \`\${posY}%\`;
-                particle.style.width = \`\${size}px\`;
-                particle.style.height = \`\${size}px\`;
+                particle.style.left = posX + '%';
+                particle.style.top = posY + '%';
+                particle.style.width = size + 'px';
+                particle.style.height = size + 'px';
                 particle.style.borderRadius = '50%';
                 particle.style.background = 'radial-gradient(circle at center, ' + particleColor + ', transparent)';
                 particle.style.boxShadow = '0 0 15px ' + shadowColor;
                 particle.style.opacity = '0.6';
                 particle.style.zIndex = '0';
-                particle.style.animation = \`float \${8 + delay}s infinite ease-in-out\`;
-                particle.style.animationDelay = \`\${delay}s\`;
-                
+                particle.style.animation = 'float ' + (8 + delay) + 's infinite ease-in-out';
+                particle.style.animationDelay = delay + 's';
                 particlesContainer.appendChild(particle);
             }
-            
-            console.log('Created ' + numParticles + ' particles for ' + sectionId);
         }
         
         // Animate on scroll
@@ -949,69 +903,13 @@ window.generateHTML = function(data) {
             });
         }
         
-        // vCard download functionality
-        document.getElementById('downloadVCard').addEventListener('click', function(e) {
-            e.preventDefault();
-
-            // Contact data - safe encoding
-            var phoneNumber = "${data.contactPhone}";
-            var contactName = "${escapedContactName} - ${escapedLawFirmName}";
-            var email = "${data.contactEmail}";
-            var address = "${escapedContactAddress}";
-            var website = "${data.contactWebsite}";
-            var fullName = "${escapedContactName}";
-            var nameParts = fullName.split(' ');
-            var lastName = nameParts.length > 1 ? nameParts.pop() : fullName;
-            var firstName = nameParts.join(' ');
-            var organization = "${escapedLawFirmName}";
-            
-            // Get the logo for the contact photo
-            var logoSrc = "${logoSrc}"; // Use the logo directly from the template data
-            
-            // Create vCard data including the photo
-            var vCardData = "BEGIN:VCARD\\n" +
-                "VERSION:3.0\\n" +
-                "N:" + lastName + ";" + firstName + ";;;\\n" +
-                "FN:" + contactName + "\\n" +
-                "ORG:" + organization + "\\n" +
-                "TEL;TYPE=WORK,VOICE:" + phoneNumber + "\\n" +
-                "ADR;TYPE=WORK:;;" + address + ";;;\\n" +
-                "EMAIL;TYPE=WORK:" + email + "\\n" +
-                "URL:" + website + "\\n";
-            
-            // Add the photo if available (base64 format)
-            if (logoSrc && logoSrc.startsWith('data:image')) {
-                // Extract base64 data from the Data URL
-                var base64Data = logoSrc.split(',')[1];
-                // Add proper PHOTO property with BASE64 encoding
-                vCardData += "PHOTO;ENCODING=b;TYPE=JPEG:" + base64Data + "\\n";
-            }
-            
-            vCardData += "END:VCARD";
-                
-            var blob = new Blob([vCardData], { type: 'text/vcard;charset=utf-8' });
-            var url = URL.createObjectURL(blob);
-
-            var link = document.createElement('a');
-            link.href = url;
-            link.setAttribute('download', firstName + '-' + lastName + '-Contact.vcf');
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-
-            URL.revokeObjectURL(url);
-            
-        });
-
         // Initialize everything when the page loads
         window.addEventListener('load', () => {
             // Debug CSS variables
             console.log('Primary color:', getComputedStyle(document.documentElement).getPropertyValue('--primary'));
-            // Create particles for all sections only once
+            // Create a single set of particles for the whole page
             setTimeout(() => {
-                createParticlesForSection('hero');
-                createParticlesForSection('features');
-                createParticlesForSection('contact'); 
+                createParticles();
             }, 100);
             animateOnScroll();
             // Make sure logo is properly displayed
@@ -1055,6 +953,54 @@ window.generateHTML = function(data) {
                 logoImg.style.maxHeight = 'none';
             }
         }
+        // Standalone vCard download for generated HTML
+        document.addEventListener('DOMContentLoaded', function() {
+            var vCardBtn = document.getElementById('downloadVCard');
+            if (vCardBtn) {
+                vCardBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    var lawFirmName = ${JSON.stringify(escapedLawFirmName)};
+                    var contactName = ${JSON.stringify(escapedContactName)};
+                    var contactPhone = ${JSON.stringify(data.contactPhone)};
+                    var contactEmail = ${JSON.stringify(data.contactEmail)};
+                    var contactAddress = ${JSON.stringify(escapedContactAddress)};
+                    var contactWebsite = ${JSON.stringify(data.contactWebsite)};
+                    var logoData = ${JSON.stringify(logoSrc)};
+                    
+                    var nameParts = contactName.split(' ');
+                    var lastName = nameParts.length > 1 ? nameParts.pop() : contactName;
+                    var firstName = nameParts.join(' ');
+                    var organization = lawFirmName;
+                    
+                    var vCardData = "BEGIN:VCARD\\n" +
+                        "VERSION:3.0\\n" +
+                        "N:" + lastName + ";" + firstName + ";;;\\n" +
+                        "FN:" + contactName + "\\n" +
+                        "ORG:" + organization + "\\n" +
+                        "TEL:" + contactPhone + "\\n" +
+                        "ADR:;;" + contactAddress + ";;;\\n" +
+                        "EMAIL:" + contactEmail + "\\n" +
+                        "URL:" + contactWebsite + "\\n";
+                    
+                    if (logoData && logoData.startsWith('data:image')) {
+                        var base64Data = logoData.split(',')[1];
+                        vCardData += "PHOTO;ENCODING=b;TYPE=JPEG:" + base64Data + "\\n";
+                    }
+                    
+                    vCardData += "END:VCARD";
+                    
+                    var blob = new Blob([vCardData], { type: 'text/vcard;charset=utf-8' });
+                    var url = URL.createObjectURL(blob);
+                    var link = document.createElement('a');
+                    link.href = url;
+                    link.setAttribute('download', firstName + '-' + lastName + '-Contact.vcf');
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    URL.revokeObjectURL(url);                    
+                });
+            }
+        });
     </script>
 </body>
 </html>`;
