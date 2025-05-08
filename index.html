@@ -566,7 +566,7 @@
 
     <!-- Load external scripts first -->
     <script src="template-editor.js"></script>
-    
+
     <script>
         // Service template
         const serviceTemplate = `
@@ -1142,6 +1142,50 @@
         saveBtn.addEventListener('click', saveEditorState);
         // Load state on page load
         window.addEventListener('DOMContentLoaded', loadEditorState);
+
+        // Add this global function for vCard download from the preview iframe
+        window.downloadVCardFromEditor = function() {
+            // Get all current values from the editor
+            const lawFirmName = document.getElementById('law-firm-name').value;
+            const contactName = document.getElementById('contact-name').value;
+            const contactPhone = document.getElementById('contact-phone').value;
+            const contactEmail = document.getElementById('contact-email').value;
+            const contactAddress = document.getElementById('contact-address').value;
+            const contactWebsite = document.getElementById('contact-website').value;
+            const logoData = window.logoData || '';
+            // vCard fields
+            const nameParts = contactName.split(' ');
+            const lastName = nameParts.length > 1 ? nameParts.pop() : contactName;
+            const firstName = nameParts.join(' ');
+            const organization = lawFirmName;
+            // vCard string
+            let vCardData = "BEGIN:VCARD\n" +
+                "VERSION:3.0\n" +
+                "N:" + lastName + ";" + firstName + ";;;\n" +
+                "FN:" + contactName + "\n" +
+                "ORG:" + organization + "\n" +
+                "TEL:" + contactPhone + "\n" +
+                "ADR:;;" + contactAddress + ";;;\n" +
+                "EMAIL:" + contactEmail + "\n" +
+                "URL:" + contactWebsite + "\n";
+            // Add the photo if available (base64 format)
+            if (logoData && logoData.startsWith('data:image')) {
+                const base64Data = logoData.split(',')[1];
+                vCardData += "PHOTO;ENCODING=b;TYPE=JPEG:" + base64Data + "\n";
+            }
+            vCardData += "END:VCARD";
+            // Download
+            const blob = new Blob([vCardData], { type: 'text/vcard;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', firstName + '-' + lastName + '-Contact.vcf');
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+            showNotification('Contact card downloaded with logo included.');
+        };
     </script>
 </body>
 </html>
