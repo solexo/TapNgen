@@ -101,7 +101,7 @@ window.generateHTML = function(data) {
             height: 100%;
             overflow: hidden;
             pointer-events: none;
-            z-index: 0; /* Make it appear above the background but below content */
+            z-index: 0; /* Below content */
         }
 
         /* Section-specific particle containers */
@@ -121,9 +121,9 @@ window.generateHTML = function(data) {
             border-radius: 50%;
             pointer-events: none;
             background: radial-gradient(circle at center, var(--primary), transparent);
-            z-index: 0; /* Change to 0 to make sure it's visible */
-            opacity: 0.5; /* Increase opacity to make more visible */
-            box-shadow: 0 0 15px rgba(var(--primary-rgb), 0.8); /* Stronger glow */
+            z-index: 0;
+            opacity: 0.5;
+            box-shadow: 0 0 15px rgba(var(--primary-rgb), 0.8);
         }
 
         /* Content containers with page background color */
@@ -217,6 +217,7 @@ window.generateHTML = function(data) {
             padding: 150px 5% 100px;
             position: relative;
             overflow: hidden;
+            z-index: 1; /* Ensure this is above particles */
         }
 
         .hero-background {
@@ -431,6 +432,7 @@ window.generateHTML = function(data) {
             position: relative;
             background: var(--section-gradient);
             position: relative; /* Ensure positioning context */
+            z-index: 1; /* Ensure this is above particles */
         }
 
         /* Add a specific semi-transparent background for features to show particles */
@@ -442,7 +444,7 @@ window.generateHTML = function(data) {
             width: 100%;
             height: 100%;
             background: var(--section-gradient);
-            opacity: 0.85; /* Slightly transparent to show particles */
+            opacity: 0.95; /* Make more opaque to hide background bleed */
             z-index: -1; /* Below content but above particles */
         }
 
@@ -535,6 +537,7 @@ window.generateHTML = function(data) {
             position: relative;
             background: var(--section-gradient);
             background-attachment: fixed;
+            z-index: 1; /* Ensure this is above particles */
         }
 
         .contact-container {
@@ -844,8 +847,8 @@ window.generateHTML = function(data) {
             if (!particlesContainer) return;
             particlesContainer.innerHTML = '';
             
-            // More particles with static positioning
-            var numParticles = 60;
+            // Fewer particles with static positioning to reduce performance issues
+            var numParticles = 40;
             var rootStyle = getComputedStyle(document.documentElement);
             var particleColor = rootStyle.getPropertyValue('--primary');
             var secondaryColor = rootStyle.getPropertyValue('--secondary');
@@ -860,8 +863,8 @@ window.generateHTML = function(data) {
                 var posX = Math.random() * 100;
                 var posY = Math.random() * 100;
                 
-                // Varied sizes
-                var size = Math.random() * 100 + 50;
+                // Smaller sizes to reduce visual glitches
+                var size = Math.random() * 80 + 30;
                 
                 // Random colors from theme
                 var colors = [particleColor, secondaryColor, accentColor];
@@ -876,20 +879,20 @@ window.generateHTML = function(data) {
                 particle.style.borderRadius = '50%';
                 particle.style.background = 'radial-gradient(circle at center, ' + randomColor + ', transparent)';
                 particle.style.boxShadow = '0 0 15px ' + randomColor;
-                particle.style.opacity = '0.4';
+                particle.style.opacity = '0.3'; // Lower opacity to reduce visual impact
                 particle.style.zIndex = '0';
                 
-                // Remove animation
+                // No animation to avoid performance issues
                 particle.style.animation = 'none';
                 particle.style.transform = 'scale(' + (Math.random() * 0.5 + 0.5) + ')';
                 
                 particlesContainer.appendChild(particle);
             }
             
-            // Also add section-specific particles
-            createSectionParticles('hero-particles', particleColor, 20);
-            createSectionParticles('features-particles', secondaryColor, 15);
-            createSectionParticles('contact-particles', accentColor, 12);
+            // Fewer section-specific particles to avoid visual glitches
+            createSectionParticles('hero-particles', particleColor, 10);
+            createSectionParticles('features-particles', secondaryColor, 8);
+            createSectionParticles('contact-particles', accentColor, 6);
         }
         
         // Create static particles for specific sections
@@ -898,14 +901,6 @@ window.generateHTML = function(data) {
             if (!container) return;
             
             container.innerHTML = '';
-            container.style.position = 'absolute';
-            container.style.top = '0';
-            container.style.left = '0';
-            container.style.width = '100%';
-            container.style.height = '100%';
-            container.style.overflow = 'hidden';
-            container.style.pointerEvents = 'none';
-            container.style.zIndex = '0';
             
             for (var i = 0; i < count; i++) {
                 var particle = document.createElement('div');
@@ -914,11 +909,11 @@ window.generateHTML = function(data) {
                 var posX = Math.random() * 100;
                 var posY = Math.random() * 100;
                 
-                // Varied sizes for section particles
-                var size = Math.random() * 80 + 40;
+                // Smaller sizes for section particles
+                var size = Math.random() * 60 + 20;
                 
                 // Apply static styles for section particles
-                particle.style.position = 'absolute';
+                particle.style.position = 'absolute'; // Use absolute instead of fixed
                 particle.style.left = posX + '%';
                 particle.style.top = posY + '%';
                 particle.style.width = size + 'px';
@@ -926,7 +921,7 @@ window.generateHTML = function(data) {
                 particle.style.borderRadius = '50%';
                 particle.style.background = 'radial-gradient(circle at center, ' + color + ', transparent)';
                 particle.style.boxShadow = '0 0 10px ' + color;
-                particle.style.opacity = '0.5';
+                particle.style.opacity = '0.3'; // Lower opacity
                 particle.style.transform = 'scale(' + (Math.random() * 0.4 + 0.6) + ')';
                 
                 container.appendChild(particle);
