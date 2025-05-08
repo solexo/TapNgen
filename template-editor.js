@@ -52,7 +52,7 @@ window.generateHTML = function(data) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>${escapedLawFirmName} - Services Juridiques</title>
+    <title>${escapedLawFirmName}</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
     <style>
@@ -628,6 +628,21 @@ window.generateHTML = function(data) {
 
         /* Make sure images are visible on all browsers/devices */
         @media (max-width: 768px) {
+            html, body {
+                width: 100vw;
+                overflow-x: hidden !important;
+            }
+            .editor-container,
+            .sidebar,
+            .preview-container,
+            .preview-frame,
+            .page-bg-container,
+            #hero,
+            #features,
+            #contact {
+                max-width: 100vw !important;
+                overflow-x: hidden !important;
+            }
             .navbar {
                 padding: 10px 15px;
             }
@@ -915,36 +930,22 @@ window.generateHTML = function(data) {
         // Animate on scroll
         function animateOnScroll() {
             const elements = document.querySelectorAll('.feature, .contact-item');
-            const sections = document.querySelectorAll('#hero, #features, #contact');
-            
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        // For content elements
-                        if (entry.target.classList.contains('feature') || entry.target.classList.contains('contact-item')) {
-                            entry.target.style.opacity = 1;
-                            entry.target.style.transform = 'translateY(0)';
-                        }
-                        
-                        // If it's a section, recreate its particles
-                        if (entry.target.id) {
-                            createParticlesForSection(entry.target.id);
-                        }
-                    }
-                });
-            }, { threshold: 0.1 });
-            
-            // Observe content elements for fade-in animation
+            // Only animate fade-in for content elements, no particle regeneration
             elements.forEach(element => {
                 element.style.opacity = 0;
                 element.style.transform = 'translateY(20px)';
                 element.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+                // Simple fade-in on scroll
+                const observer = new IntersectionObserver((entries, obs) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            entry.target.style.opacity = 1;
+                            entry.target.style.transform = 'translateY(0)';
+                            obs.unobserve(entry.target);
+                        }
+                    });
+                }, { threshold: 0.1 });
                 observer.observe(element);
-            });
-            
-            // Observe sections for particle recreation
-            sections.forEach(section => {
-                observer.observe(section);
             });
         }
         
@@ -1000,37 +1001,29 @@ window.generateHTML = function(data) {
 
             URL.revokeObjectURL(url);
             
-            // Show a notification
-            alert('Contact card downloaded with logo included.');
         });
 
         // Initialize everything when the page loads
         window.addEventListener('load', () => {
             // Debug CSS variables
             console.log('Primary color:', getComputedStyle(document.documentElement).getPropertyValue('--primary'));
-            
-            // Create particles for all sections
+            // Create particles for all sections only once
             setTimeout(() => {
                 createParticlesForSection('hero');
                 createParticlesForSection('features');
                 createParticlesForSection('contact'); 
             }, 100);
-            
             animateOnScroll();
-            
             // Make sure logo is properly displayed
             ensureLogoDisplay();
-            
             // Handle window resize for responsive behavior
             handleResponsive();
             window.addEventListener('resize', handleResponsive);
-            
             // Smooth scroll for navigation links
             document.querySelectorAll('a[href^="#"]:not([href="#"])').forEach(anchor => {
                 anchor.addEventListener('click', function (e) {
                     if(this.getAttribute('href') === "#") return;
                     e.preventDefault();
-                    
                     const targetElement = document.querySelector(this.getAttribute('href'));
                     if(targetElement) {
                         targetElement.scrollIntoView({
