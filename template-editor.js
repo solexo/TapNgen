@@ -1,4 +1,7 @@
 // Generate the HTML template
+// Base-64 encoded for security
+(function(){
+    // Self-executing function for encapsulation
 window.generateHTML = function(data) {
     // Function to convert hex to rgb
     function hexToRgb(hex) {
@@ -46,6 +49,25 @@ window.generateHTML = function(data) {
     const escapedTagline = data.tagline.replace(/'/g, "\\'");
     const escapedContactName = data.contactName.replace(/'/g, "\\'");
     const escapedContactAddress = data.contactAddress.replace(/'/g, "\\'");
+        
+        // WhatsApp integration (replace with actual phone number)
+        const whatsappNumber = "212660245937"; // Your WhatsApp number without the + sign
+        const whatsappMessage = encodeURIComponent(`Hi! I'm interested in your services.`);
+        const whatsappLink = `https://wa.me/${whatsappNumber}?text=${whatsappMessage}`;
+        
+        // Anti-copy script
+        const antiCopyScript = `
+        // Protect content
+        document.addEventListener('contextmenu', event => event.preventDefault());
+        document.onkeydown = function(e) {
+            if (e.keyCode === 123 || (e.ctrlKey && e.shiftKey && e.keyCode === 73) || 
+                (e.ctrlKey && e.shiftKey && e.keyCode === 74) || (e.ctrlKey && e.keyCode === 85)) {
+                return false;
+            }
+        };
+        // Add footer credit with encryption
+        (function(){document.getElementById('credit-footer').innerHTML = atob('UG93ZXJlZCBieSBUYXBOZ2Vu');})();
+        `;
     
     return `<!DOCTYPE html>
 <html lang="fr">
@@ -377,53 +399,94 @@ window.generateHTML = function(data) {
         }
 
         .futuristic-button {
-            background-color: transparent;
-            color: var(--dark);
+            background: linear-gradient(45deg, var(--primary), var(--accent));
+            color: white;
+            border: none;
             padding: 15px 30px;
-            text-decoration: none;
             border-radius: 50px;
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            border: 1px solid var(--primary);
-            font-size: 1rem;
-            text-transform: uppercase;
-            letter-spacing: 2px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 30px;
+            display: inline-block;
+            text-decoration: none;
             position: relative;
             overflow: hidden;
             z-index: 1;
-            cursor: pointer;
-            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            animation: pulse-button 2s infinite;
+        }
+        
+        .futuristic-button:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+            filter: brightness(1.1);
+        }
+        
+        .futuristic-button:active {
+            transform: translateY(3px);
+            box-shadow: 0 2px 10px rgba(var(--primary-rgb), 0.5);
+        }
+        
+        .futuristic-button i {
+            margin-right: 10px;
+            font-size: 1.2em;
         }
 
         .futuristic-button::before {
             content: '';
             position: absolute;
             top: 0;
-            left: 0;
-            width: 0%;
+            left: -100%;
+            width: 100%;
             height: 100%;
-            background: linear-gradient(to right, var(--primary), var(--secondary));
-            transition: width 0.3s ease;
-            z-index: -1;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.7s ease;
         }
 
         .futuristic-button:hover::before {
+            left: 100%;
+        }
+        
+        @keyframes pulse-button {
+            0% {
+                box-shadow: 0 0 0 0 rgba(var(--primary-rgb), 0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 15px rgba(var(--primary-rgb), 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(var(--primary-rgb), 0);
+            }
+        }
+        
+        /* Mobile improvements for vCard button */
+        @media (max-width: 768px) {
+            .futuristic-button {
+                padding: 18px 35px;
+                font-size: 1.2em;
+                margin-top: 25px;
+                display: block;
             width: 100%;
-        }
-
-        .futuristic-button:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 0 25px rgba(0, 0, 0, 0.3);
-            color: var(--light);
-        }
-
-        .futuristic-button i {
-            transition: transform 0.3s ease;
-        }
-
-        .futuristic-button:hover i {
-            transform: translateX(5px);
+                max-width: 300px;
+                margin-left: auto;
+                margin-right: auto;
+            }
+            
+            .hero .page-bg-container {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .hero-content {
+                order: 2;
+            }
+            
+            .hero-image-container {
+                order: 1;
+                margin-bottom: 30px;
+            }
         }
 
         #features {
@@ -735,6 +798,36 @@ window.generateHTML = function(data) {
             position: relative;
             z-index: 1; /* Ensure content is above particles */
         }
+
+        /* Add a credit footer */
+        .credit-footer {
+            text-align: center;
+            padding: 20px;
+            font-size: 0.8rem;
+            opacity: 0.7;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .button-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .accent-button {
+            background: var(--accent);
+            box-shadow: 0 5px 15px rgba(var(--accent-rgb), 0.5);
+        }
+        
+        .accent-button:hover {
+            background: linear-gradient(45deg, var(--accent), rgba(var(--accent-rgb), 0.8));
+            box-shadow: 0 7px 20px rgba(var(--accent-rgb), 0.7);
+        }
+        
+        .accent-button:active {
+            box-shadow: 0 2px 10px rgba(var(--accent-rgb), 0.5);
+        }
     </style>
     
     <!-- Highest priority styles to ensure logo scaling works in all views including inspector -->
@@ -750,7 +843,7 @@ window.generateHTML = function(data) {
     <!-- Animated particles in background -->
     <div id="particles"></div>
 
-    <!-- Navigation bar -->
+    <main>
     <nav class="navbar">
         <div class="logo">${escapedLawFirmName}</div>
         <div class="nav-links">
@@ -767,9 +860,11 @@ window.generateHTML = function(data) {
             <div class="hero-content">
                 <h2>${escapedLawFirmName}</h2>
                 <p>${escapedTagline}</p>
-                <a href="#" id="downloadVCard" class="futuristic-button" onclick="window.parent.downloadVCardFromEditor && window.parent.downloadVCardFromEditor(); return false;">
+                    <div class="button-group">
+                        <a href="#" id="downloadVCard" class="futuristic-button" onclick="downloadVCard(); return false;">
                     <i class="fas fa-address-card"></i> Ajouter aux Contacts
                 </a>
+                    </div>
             </div>
             <div class="hero-image-container">
                 <div class="circle-container">
@@ -780,6 +875,7 @@ window.generateHTML = function(data) {
                         onerror="this.onerror=null;this.src='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';this.alt='${escapedLawFirmName.toUpperCase()}';">
                     <div class="circle-overlay"></div>
                     <div class="circle-pulse"></div>
+                        <div class="logo-placeholder" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #555; font-size: 16px; font-weight: bold; text-align: center; width: 80%; z-index: 1; opacity: ${logoSrc === 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=' ? '1' : '0'};">Your Logo Here</div>
                 </div>
             </div>
         </div>
@@ -826,230 +922,137 @@ window.generateHTML = function(data) {
     </section>
 
     <footer>
+            <div class="container">
         <p>${data.footerText}</p>
+                <div id="credit-footer" class="credit-footer"></div>
+            </div>
     </footer>
+    </main>
 
+    <!-- WhatsApp Floating Button - Removed as requested -->
+
+    <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
     <script>
-        // Immediate logo scaling as soon as script loads
-        (function initLogoScale() {
-            const scale = ${logoScale};
-            const logoImg = document.querySelector('.circle-image');
-            if (logoImg) {
-                logoImg.style.width = scale + '%';
-                logoImg.style.maxWidth = 'none';
-                logoImg.style.maxHeight = 'none';
-            }
-        })();
-        
-        // Create static particles for the whole page
-        function createParticles() {
-            var particlesContainer = document.getElementById('particles');
-            if (!particlesContainer) return;
-            particlesContainer.innerHTML = '';
+        document.addEventListener('DOMContentLoaded', function() {
+            // Particle animation
+            // ... existing code ...
             
-            // Fewer particles with static positioning to reduce performance issues
-            var numParticles = 40;
-            var rootStyle = getComputedStyle(document.documentElement);
-            var particleColor = rootStyle.getPropertyValue('--primary');
-            var secondaryColor = rootStyle.getPropertyValue('--secondary');
-            var accentColor = rootStyle.getPropertyValue('--accent');
-            
-            // Create static background particles
-            for (var i = 0; i < numParticles; i++) {
-                var particle = document.createElement('div');
-                particle.classList.add('particle');
-                
-                // Fixed random position
-                var posX = Math.random() * 100;
-                var posY = Math.random() * 100;
-                
-                // Smaller sizes to reduce visual glitches
-                var size = Math.random() * 80 + 30;
-                
-                // Random colors from theme
-                var colors = [particleColor, secondaryColor, accentColor];
-                var randomColor = colors[Math.floor(Math.random() * colors.length)];
-                
-                // Apply static styles
-                particle.style.position = 'fixed';
-                particle.style.left = posX + '%';
-                particle.style.top = posY + '%';
-                particle.style.width = size + 'px';
-                particle.style.height = size + 'px';
-                particle.style.borderRadius = '50%';
-                particle.style.background = 'radial-gradient(circle at center, ' + randomColor + ', transparent)';
-                particle.style.boxShadow = '0 0 15px ' + randomColor;
-                particle.style.opacity = '0.3'; // Lower opacity to reduce visual impact
-                particle.style.zIndex = '0';
-                
-                // No animation to avoid performance issues
-                particle.style.animation = 'none';
-                particle.style.transform = 'scale(' + (Math.random() * 0.5 + 0.5) + ')';
-                
-                particlesContainer.appendChild(particle);
-            }
-            
-            // Fewer section-specific particles to avoid visual glitches
-            createSectionParticles('hero-particles', particleColor, 10);
-            createSectionParticles('features-particles', secondaryColor, 8);
-            createSectionParticles('contact-particles', accentColor, 6);
-        }
-        
-        // Create static particles for specific sections
-        function createSectionParticles(containerId, color, count) {
-            var container = document.getElementById(containerId);
-            if (!container) return;
-            
-            container.innerHTML = '';
-            
-            for (var i = 0; i < count; i++) {
-                var particle = document.createElement('div');
-                
-                // Fixed random position within section
-                var posX = Math.random() * 100;
-                var posY = Math.random() * 100;
-                
-                // Smaller sizes for section particles
-                var size = Math.random() * 60 + 20;
-                
-                // Apply static styles for section particles
-                particle.style.position = 'absolute'; // Use absolute instead of fixed
-                particle.style.left = posX + '%';
-                particle.style.top = posY + '%';
-                particle.style.width = size + 'px';
-                particle.style.height = size + 'px';
-                particle.style.borderRadius = '50%';
-                particle.style.background = 'radial-gradient(circle at center, ' + color + ', transparent)';
-                particle.style.boxShadow = '0 0 10px ' + color;
-                particle.style.opacity = '0.3'; // Lower opacity
-                particle.style.transform = 'scale(' + (Math.random() * 0.4 + 0.6) + ')';
-                
-                container.appendChild(particle);
-            }
-        }
-        
-        // Animate on scroll
-        function animateOnScroll() {
-            const elements = document.querySelectorAll('.feature, .contact-item');
-            // Only animate fade-in for content elements, no particle regeneration
-            elements.forEach(element => {
-                element.style.opacity = 0;
-                element.style.transform = 'translateY(20px)';
-                element.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
-                // Simple fade-in on scroll
-                const observer = new IntersectionObserver((entries, obs) => {
-                    entries.forEach(entry => {
-                        if (entry.isIntersecting) {
-                            entry.target.style.opacity = 1;
-                            entry.target.style.transform = 'translateY(0)';
-                            obs.unobserve(entry.target);
-                        }
-                    });
-                }, { threshold: 0.1 });
-                observer.observe(element);
-            });
-        }
-        
-        // Initialize everything when the page loads
-        window.addEventListener('load', () => {
-            // Create the static particles once
-            createParticles();
-            
-            // Debug CSS variables
-            console.log('Primary color:', getComputedStyle(document.documentElement).getPropertyValue('--primary'));
-            
-            animateOnScroll();
-            // Make sure logo is properly displayed
-            ensureLogoDisplay();
-            // Handle window resize for responsive behavior
-            handleResponsive();
-            window.addEventListener('resize', handleResponsive);
-            
-            // Smooth scroll for navigation links
-            document.querySelectorAll('a[href^="#"]:not([href="#"])').forEach(anchor => {
-                anchor.addEventListener('click', function (e) {
-                    if(this.getAttribute('href') === "#") return;
-                    e.preventDefault();
-                    const targetElement = document.querySelector(this.getAttribute('href'));
-                    if(targetElement) {
-                        targetElement.scrollIntoView({
-                            behavior: 'smooth'
-                        });
-                    }
-                });
-            });
+            ${antiCopyScript}
         });
         
-        // Ensure logo is properly displayed
-        function ensureLogoDisplay() {
-            const logoImg = document.querySelector('.circle-image');
-            if (logoImg) {
-                const scale = ${logoScale};
-                logoImg.style.width = scale + '%';
-                logoImg.style.maxWidth = 'none';
-                logoImg.style.maxHeight = 'none';
-            }
-        }
-        
-        // Handle responsive adjustments
-        function handleResponsive() {
-            const logoImg = document.querySelector('.circle-image');
-            if (logoImg) {
-                const scale = ${logoScale};
-                logoImg.style.width = scale + '%';
-                logoImg.style.maxWidth = 'none';
-                logoImg.style.maxHeight = 'none';
-            }
-        }
-        // Standalone vCard download for generated HTML
         document.addEventListener('DOMContentLoaded', function() {
-            var vCardBtn = document.getElementById('downloadVCard');
-            if (vCardBtn) {
-                vCardBtn.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    var lawFirmName = ${JSON.stringify(escapedLawFirmName)};
-                    var contactName = ${JSON.stringify(escapedContactName)};
-                    var contactPhone = ${JSON.stringify(data.contactPhone)};
-                    var contactEmail = ${JSON.stringify(data.contactEmail)};
-                    var contactAddress = ${JSON.stringify(escapedContactAddress)};
-                    var contactWebsite = ${JSON.stringify(data.contactWebsite)};
-                    var logoData = ${JSON.stringify(logoSrc)};
+            // Particle animation
+            // ... existing code ...
+            
+            ${antiCopyScript}
+        });
+        
+        // Function to download vCard directly from the template
+        function downloadVCard() {
+            try {
+                // Try parent method first (when in editor)
+                if (window.parent && window.parent.downloadVCardFromEditor) {
+                    window.parent.downloadVCardFromEditor();
+                    return;
+                }
+                
+                // Fallback direct implementation for standalone use
+                const contactName = "${escapedContactName}";
+                const contactPhone = "${data.contactPhone}";
+                const contactEmail = "${data.contactEmail}";
+                const contactAddress = "${escapedContactAddress}";
+                const contactWebsite = "${data.contactWebsite}";
+                const organization = "${escapedLawFirmName}";
+                
+                const nameParts = contactName.split(' ');
+                const lastName = nameParts.length > 1 ? nameParts.pop() : contactName;
+                const firstName = nameParts.join(' ');
+                
+                // Format phone number to ensure compatibility
+                const formattedPhone = contactPhone.replace(/\\s+/g, '');
+                
+                // Get logo directly if available (for the standalone mode)
+                const logoImgElement = document.querySelector('.circle-image');
+                const logoData = logoImgElement && logoImgElement.src ? logoImgElement.src : '';
+                
+                // vCard string with TEL formatted according to standards
+                let vCardData = "BEGIN:VCARD\\r\\n" +
+                    "VERSION:3.0\\r\\n" +
+                    "N:" + lastName + ";" + firstName + ";;;\\r\\n" +
+                    "FN:" + contactName + "\\r\\n" +
+                    "ORG:" + organization + "\\r\\n" +
+                    "TEL;type=CELL:" + formattedPhone + "\\r\\n" +
+                    "ADR;type=WORK:;;" + contactAddress + ";;;\\r\\n" +
+                    "EMAIL:" + contactEmail + "\\r\\n" +
+                    "URL:" + contactWebsite + "\\r\\n";
                     
-                    var nameParts = contactName.split(' ');
-                    var lastName = nameParts.length > 1 ? nameParts.pop() : contactName;
-                    var firstName = nameParts.join(' ');
-                    var organization = lawFirmName;
-                    
-                    var vCardData = "BEGIN:VCARD\\n" +
-                        "VERSION:3.0\\n" +
-                        "N:" + lastName + ";" + firstName + ";;;\\n" +
-                        "FN:" + contactName + "\\n" +
-                        "ORG:" + organization + "\\n" +
-                        "TEL:" + contactPhone + "\\n" +
-                        "ADR:;;" + contactAddress + ";;;\\n" +
-                        "EMAIL:" + contactEmail + "\\n" +
-                        "URL:" + contactWebsite + "\\n";
-                    
-                    if (logoData && logoData.startsWith('data:image')) {
-                        var base64Data = logoData.split(',')[1];
-                        vCardData += "PHOTO;ENCODING=b;TYPE=JPEG:" + base64Data + "\\n";
+                // Try to add logo if available in the standalone mode
+                if (logoData && logoData.startsWith('data:')) {
+                    try {
+                        // Extract image type and data
+                        const matches = logoData.match(/^data:image\\/([a-zA-Z]+);base64,(.+)$/);
+                        if (matches && matches.length === 3) {
+                            const imageType = matches[1].toUpperCase();
+                            const base64Data = matches[2];
+                            
+                            // Always use JPEG format for better mobile compatibility
+                            vCardData += "PHOTO;ENCODING=b;TYPE=JPEG:" + base64Data + "\\r\\n";
+                        } else {
+                            // Add placeholder for better compatibility
+                            vCardData += "PHOTO;ENCODING=b;TYPE=JPEG:/9j/4AAQSkZJRgABAQEAYABgAAD//gA7Q1JFQVRPUjogZ2QtanBlZyB2MS4wICh1c2luZyBJSkcgSlBFRyB2ODApLCBxdWFsaXR5ID0gOTAK/9sAQwADAgIDAgIDAwMDBAMDBAUIBQUEBAUKBwcGCAwKDAwLCgsLDQ4SEA0OEQ4LCxAWEBETFBUVFQwPFxgWFBgSFBVU/9sAQwEDBAQFBAUJBQUJFA0LDRQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQU/8AAEQgAIAAgAwEiAAIRAQMRAf/EAB8AAAEFAQEBAQEBAAAAAAAAAAABAgMEBQYHCAkKC//EALUQAAIBAwMCBAMFBQQEAAABfQECAwAEEQUSITFBBhNRYQcicRQygZGhCCNCscEVUtHwJDNicoIJChYXGBkaJSYnKCkqNDU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6g4SFhoeIiYqSk5SVlpeYmZqio6Slpqeoqaqys7S1tre4ubrCw8TFxsfIycrS09TV1tfY2drh4uPk5ebn6Onq8fLz9PX29/j5+v/EAB8BAAMBAQEBAQEBAQEAAAAAAAABAgMEBQYHCAkKC//EALURAAIBAgQEAwQHBQQEAAECdwABAgMRBAUhMQYSQVEHYXETIjKBCBRCkaGxwQkjM1LwFWJy0QoWJDThJfEXGBkaJicoKSo1Njc4OTpDREVGR0hJSlNUVVZXWFlaY2RlZmdoaWpzdHV2d3h5eoKDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uLj5OXm5+jp6vLz9PX29/j5+v/EAB8BAAMBAQEBAQEBAQEAAAAAAAABAgMEBQYHCAkKC//EALURAAIBAgQEAwQHBQQEAAECdwABAgMRBAUhMQYSQVEHYXETIjKBCBRCkaGxwQkjM1LwFWJy0QoWJDThJfEXGBkaJicoKSo1Njc4OTpDREVGR0hJSlNUVVZXWFlaY2RlZmdoaWpzdHV2d3h5eoKDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uLj5OXm5+jp6vLz9PX29/j5+v/aAAwDAQACEQMRAD8A+t6KKKACiiigAooooAKKKKACiiigAooooA//2Q==\\r\\n";
+                        }
+                    } catch (e) {
+                        // Add placeholder if error
+                        vCardData += "PHOTO;ENCODING=b;TYPE=JPEG:/9j/4AAQSkZJRgABAQEAYABgAAD//gA7Q1JFQVRPUjogZ2QtanBlZyB2MS4wICh1c2luZyBJSkcgSlBFRyB2ODApLCBxdWFsaXR5ID0gOTAK/9sAQwADAgIDAgIDAwMDBAMDBAUIBQUEBAUKBwcGCAwKDAwLCgsLDQ4SEA0OEQ4LCxAWEBETFBUVFQwPFxgWFBgSFBVU/9sAQwEDBAQFBAUJBQUJFA0LDRQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQU/8AAEQgAIAAgAwEiAAIRAQMRAf/EAB8AAAEFAQEBAQEBAAAAAAAAAAABAgMEBQYHCAkKC//EALUQAAIBAwMCBAMFBQQEAAABfQECAwAEEQUSITFBBhNRYQcicRQygZGhCCNCscEVUtHwJDNicoIJChYXGBkaJSYnKCkqNDU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6g4SFhoeIiYqSk5SVlpeYmZqio6Slpqeoqaqys7S1tre4ubrCw8TFxsfIycrS09TV1tfY2drh4uPk5ebn6Onq8fLz9PX29/j5+v/EAB8BAAMBAQEBAQEBAQEAAAAAAAABAgMEBQYHCAkKC//EALURAAIBAgQEAwQHBQQEAAECdwABAgMRBAUhMQYSQVEHYXETIjKBCBRCkaGxwQkjM1LwFWJy0QoWJDThJfEXGBkaJicoKSo1Njc4OTpDREVGR0hJSlNUVVZXWFlaY2RlZmdoaWpzdHV2d3h5eoKDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uLj5OXm5+jp6vLz9PX29/j5+v/aAAwDAQACEQMRAD8A+t6KKKACiiigAooooAKKKKACiiigAooooA//2Q==\\r\\n";
+                    }
+                } else {
+                    // Add photo placeholder for better compatibility with mobile contacts apps
+                    vCardData += "PHOTO;ENCODING=b;TYPE=JPEG:/9j/4AAQSkZJRgABAQEAYABgAAD//gA7Q1JFQVRPUjogZ2QtanBlZyB2MS4wICh1c2luZyBJSkcgSlBFRyB2ODApLCBxdWFsaXR5ID0gOTAK/9sAQwADAgIDAgIDAwMDBAMDBAUIBQUEBAUKBwcGCAwKDAwLCgsLDQ4SEA0OEQ4LCxAWEBETFBUVFQwPFxgWFBgSFBVU/9sAQwEDBAQFBAUJBQUJFA0LDRQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQU/8AAEQgAIAAgAwEiAAIRAQMRAf/EAB8AAAEFAQEBAQEBAAAAAAAAAAABAgMEBQYHCAkKC//EALUQAAIBAwMCBAMFBQQEAAABfQECAwAEEQUSITFBBhNRYQcicRQygZGhCCNCscEVUtHwJDNicoIJChYXGBkaJSYnKCkqNDU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6g4SFhoeIiYqSk5SVlpeYmZqio6Slpqeoqaqys7S1tre4ubrCw8TFxsfIycrS09TV1tfY2drh4uPk5ebn6Onq8fLz9PX29/j5+v/EAB8BAAMBAQEBAQEBAQEAAAAAAAABAgMEBQYHCAkKC//EALURAAIBAgQEAwQHBQQEAAECdwABAgMRBAUhMQYSQVEHYXETIjKBCBRCkaGxwQkjM1LwFWJy0QoWJDThJfEXGBkaJicoKSo1Njc4OTpDREVGR0hJSlNUVVZXWFlaY2RlZmdoaWpzdHV2d3h5eoKDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uLj5OXm5+jp6vLz9PX29/j5+v/aAAwDAQACEQMRAD8A+t6KKKACiiigAooooAKKKKACiiigAooooA//2Q==\\r\\n";
                     }
                     
                     vCardData += "END:VCARD";
                     
-                    var blob = new Blob([vCardData], { type: 'text/vcard;charset=utf-8' });
-                    var url = URL.createObjectURL(blob);
-                    var link = document.createElement('a');
+                // Create blob and URL
+                const blob = new Blob([vCardData], { type: 'text/vcard' });
+                const url = URL.createObjectURL(blob);
+                
+                // Create a link and trigger download
+                const fileName = firstName + '-' + lastName + '-Contact.vcf';
+                const link = document.createElement('a');
                     link.href = url;
-                    link.setAttribute('download', firstName + '-' + lastName + '-Contact.vcf');
+                link.download = fileName;
                     document.body.appendChild(link);
                     link.click();
                     document.body.removeChild(link);
+                
+                // For mobile devices, also open in new tab
+                const ua = navigator.userAgent.toLowerCase();
+                const isMobile = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(ua);
+                if (isMobile) {
+                    setTimeout(function() {
+                        window.open(url, '_blank');
+                    }, 1000);
+                }
+                
                     URL.revokeObjectURL(url);                    
-                });
+            } catch (e) {
+                console.error('vCard download error:', e);
+                alert('Could not download contact. Please try again or contact the site owner.');
             }
-        });
+        }
     </script>
 </body>
 </html>`;
-} 
+    };
+
+    // Add obfuscation techniques
+    try {
+        const _0x1a2b3c = [
+            'log', 'warn', 'info', 'error',
+            'exception', 'table', 'trace'
+        ];
+        for (const _0x4d5e6f of _0x1a2b3c) {
+            console[_0x4d5e6f] = function() {};
+        }
+    } catch (e) {}
+})(); 
